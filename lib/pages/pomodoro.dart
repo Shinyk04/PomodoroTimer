@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -19,6 +20,7 @@ class _PomoTimerState extends State<PomoTimer> {
   late int currentTime;
   Phase _phase = Phase.breakPhase;
   Timer? _timer;
+  final player = AudioPlayer();
 
   @override
   void initState() {
@@ -39,6 +41,7 @@ class _PomoTimerState extends State<PomoTimer> {
       // If the timer is finished switch from break 
       // phase to study phase or vice versa
       if (currentTime <= 0) {
+        playSound();
         _timer?.cancel();
         setState(() {
           if (_phase == Phase.breakPhase) {
@@ -74,15 +77,28 @@ class _PomoTimerState extends State<PomoTimer> {
     return "${twoDigits(h)}:${twoDigits(m)}:${twoDigits(s)}";
   }
 
+  Color get _phaseColor {
+    return _phase == Phase.breakPhase
+      ? Color.fromARGB(255, 167, 211, 232)
+      : Color.fromARGB(255, 210, 167, 232);
+  }
+
+  Future<void> playSound() async{
+    String audioPath = "audio/sound2.mp3";
+    await player.play(AssetSource(audioPath));
+  }
+
   @override
   Widget build(BuildContext context) {
     String buttonText = 
       // Button text depending on current phase
       _phase == Phase.breakPhase ? "Start Break" : "Start Studying";
 
+    Color theme = _phaseColor;
+    
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 131, 125, 225),
+        backgroundColor: theme,
         title: Center(
           child: Text(
             "Your Pomodoro", 
@@ -95,7 +111,7 @@ class _PomoTimerState extends State<PomoTimer> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Text(
               _phase == Phase.breakPhase ? "Break Time:" : "Study Time:",
@@ -108,12 +124,12 @@ class _PomoTimerState extends State<PomoTimer> {
             ),
             SizedBox(height:40),
             ElevatedButton(
-              style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(const Color.fromARGB(255, 171, 167, 232))),
+              style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(theme)),
               onPressed: _studyTimer,
               child: Text(buttonText),
             ),
             ElevatedButton(
-              style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(const Color.fromARGB(255, 171, 167, 232))),
+              style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(theme)),
               onPressed: _stopTimer,
               child: Text("Stop")
             ),
