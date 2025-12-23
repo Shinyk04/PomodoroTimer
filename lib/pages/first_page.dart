@@ -14,6 +14,8 @@ class _TimerPageState extends State<TimerPage> {
   int timeElapsed = 0;
   bool timerRunning = false;
   Timer? _timer;
+  final TextEditingController _studyController = TextEditingController();
+  final TextEditingController _breakController = TextEditingController();
 
   // Function to format time as 00:00:00
   String get _formattedTime {
@@ -48,9 +50,13 @@ class _TimerPageState extends State<TimerPage> {
     timeElapsed = 0;
   }
 
+  // Enter a specified time
+
   @override
   void dispose() {
     _timer?.cancel();
+    _studyController.dispose();
+    _breakController.dispose();
     super.dispose();
   }
 
@@ -98,14 +104,50 @@ class _TimerPageState extends State<TimerPage> {
                 ),
               ],
             ),
+
+            Column(
+              children: [
+                const Text("Or enter custom times (minutes):"),
+
+                Padding(padding: const EdgeInsets.symmetric(horizontal: 40),
+                  child: TextField(
+                    controller: _studyController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: "Study time (minutes)",
+                    )
+                  ),
+                ),
+
+                Padding(padding: const EdgeInsets.symmetric(horizontal: 40),
+                  child: TextField(
+                    controller: _breakController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: "Break time (minutes)",
+                    ),
+                  ),
+                ),
+              ],  
+            ),
+//          ],
+//        )
             
             ElevatedButton(
               style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(const Color.fromARGB(255, 171, 167, 232))),
               onPressed: () {
+                final int? studyMinutes = 
+                  int.tryParse(_studyController.text);
+                final int? breakMinutes = 
+                  int.tryParse(_breakController.text);
+
                 Navigator.push(
                   context, 
                   MaterialPageRoute(
-                    builder: (context) => PomoTimer(startSeconds: timeElapsed)
+                    builder: (context) => PomoTimer(
+                      startSeconds: studyMinutes != null ? studyMinutes*60 : timeElapsed,
+                      breakSeconds: breakMinutes != null ? breakMinutes*60 : null,
+                      )
                   ),
                 );
               }, 

@@ -4,8 +4,13 @@ import 'dart:async';
 
 class PomoTimer extends StatefulWidget {
   final int startSeconds;
+  final int? breakSeconds;
 
-  const PomoTimer({super.key, required this.startSeconds});
+  const PomoTimer({
+    super.key, 
+    required this.startSeconds,
+    this.breakSeconds,
+    });
 
   @override
   State<PomoTimer> createState() => _PomoTimerState();
@@ -25,10 +30,10 @@ class _PomoTimerState extends State<PomoTimer> {
   @override
   void initState() {
     // Initialize study time to be the duration from last page
-    // and break time to be 20% of this
+    // and break time to be 20% of this unless otherwise specified
     super.initState();
     studyTime = widget.startSeconds;
-    breakTime = (studyTime * 0.2).toInt();
+    breakTime = widget.breakSeconds ?? (studyTime * 0.2).toInt();
     currentTime = breakTime;
   }
 
@@ -84,7 +89,7 @@ class _PomoTimerState extends State<PomoTimer> {
   }
 
   Future<void> playSound() async{
-    String audioPath = "audio/sound2.mp3";
+    String audioPath = "audio/untitled.mp3";
     await player.play(AssetSource(audioPath));
   }
 
